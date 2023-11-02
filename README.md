@@ -30,7 +30,7 @@
 then run `mkinitcpio -P`.
 
 * Make swapfile and activate it<br>
-`btrfs filesystem makeswapfile --size=4g --uuid clear /swap/swapfile`<br>
+`btrfs filesystem mkswapfile --size=4g --uuid clear /swap/swapfile`<br>
 `swapon /swap/swapfile`
 
 * Edit /etc/fstab and add<br>
