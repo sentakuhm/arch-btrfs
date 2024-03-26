@@ -129,3 +129,20 @@ BTRFS snapshots on Arch Linux
     ID 269 gen 855 top level 258 path @.snapshots/6/snapshot
     ID 270 gen 859 top level 258 path @.snapshots/7/snapshot
     ```
+
+6. Swap file
+   
+   To properly initialize a swap file, first create a non-snapshotted subvolume to host the file, e.g.
+   ```ini
+    $ sudo btrfs subvolume create /swap
+   ```
+   Then Create the swapfile and activate it
+   ```ini
+    $ sudo btrfs filesystem mkswapfile --size 4g --uuid clear /swap/swapfile
+    $ sudo swapon /swap/swapfile
+   ```
+   Finally, edit the `/etc/fstab` configuration to add an entry for the swap file
+   ```ini
+    /swap/swapfile none swap defaults 0 0
+   ```
+   
