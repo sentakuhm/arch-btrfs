@@ -12,7 +12,7 @@ BTRFS snapshots on Arch Linux
 
     Unmount the subvolume and remove the mountpoint
 
-    ```ini
+    ```cmd
     $ sudo umount /.snapshots
     $ sudo rm -rf /.snapshots
     ```
@@ -31,7 +31,7 @@ BTRFS snapshots on Arch Linux
 
     List subvolumes
 
-    ```ini
+    ```cmd
     $ sudo btrfs subvolume list /
     ID 256 gen 199 top level 5 path @
     ID 257 gen 186 top level 5 path @home
@@ -44,28 +44,35 @@ BTRFS snapshots on Arch Linux
 
     I prefer my `@snapshots` setup over `.snapshots`, so I delete the Snapper-generated subvolume
 
-    ```ini
+    ```cmd
     $ sudo btrfs subvolume delete .snapshots
     Delete subvolume (no-commit): '//.snapshots'
     ```
 
     Re-create and re-mount `/.snapshots` mountpoint
 
-    ```ini
+    ```cmd
     $ sudo mkdir /.snapshots
     $ sudo mount -a
     ```
 
     This setup will make all snapshots created by Snapper be stored outside of the `@` subvolume. This allows replacing `@` without losing the snapshots.
 
-4. Manual snapshot
+   Set permissions. Owner must be root, and I allow members of wheel to browse through snapshots
+
+   ```cmd
+   $ sudo chmod 750 /.snapshots
+   $ sudo chown :wheel /.snapshots
+   ```
+    
+5. Manual snapshot
     Example of taking a manual snapshot of a fresh install
-    ```ini
+    ```cmd
     $ sudo snapper -c root create -d "**First Arch Shot**"
     ```
 
 
-5. Automatic timeline snapshots
+6. Automatic timeline snapshots
 
     Edit `/etc/snapper/configs/root`, and I allow group of `wheel` to browse through snapshots
 
@@ -86,14 +93,14 @@ BTRFS snapshots on Arch Linux
 
     Start and enable snapper-timeline.timer to launch the automatic snapshot timeline, and snapper-cleanup.timer to periodically clean up older snapshots
 
-    ```ini
+    ```cmd
     $ sudo systemctl enable --now snapper-timeline.timer
     $ sudo systemctl enable --now snapper-cleanup.timer
 
     ```
     List configs
 
-    ```ini
+    ```cmd
     $ snapper list-configs
     Config | Subvolume
     -------+----------
@@ -102,7 +109,7 @@ BTRFS snapshots on Arch Linux
 
     List snapshots taken for `root`
     
-    ```ini
+    ```cmd
     $ sudo snapper -c root list                                                                                                      
    # | Type   | Pre # | Date                            | User | Cleanup | Description                          | Userdata
     ---+--------+-------+---------------------------------+------+---------+--------------------------------------+---------
@@ -115,7 +122,7 @@ BTRFS snapshots on Arch Linux
 
     List updated subvolumes list, which now includes the snapshots
 
-    ```ini
+    ```cmd
     $ sudo btrfs subvolume list /                                                                                                    
     ID 256 gen 918 top level 5 path @
     ID 257 gen 1083 top level 5 path @home
@@ -130,19 +137,19 @@ BTRFS snapshots on Arch Linux
     ID 270 gen 859 top level 258 path @.snapshots/7/snapshot
     ```
 
-6. Swap file
+7. Swap file
    
    To properly initialize a swap file, first create a non-snapshotted subvolume to host the file, e.g.
-   ```ini
-    $ sudo btrfs subvolume create /swap
+   ```cmd
+   $ sudo btrfs subvolume create /swap
    ```
    Then Create the swapfile and activate it
-   ```ini
-    $ sudo btrfs filesystem mkswapfile --size 4g --uuid clear /swap/swapfile
-    $ sudo swapon /swap/swapfile
+   ```cmd
+   $ sudo btrfs filesystem mkswapfile --size 4g --uuid clear /swap/swapfile
+   $ sudo swapon /swap/swapfile
    ```
    Finally, edit the `/etc/fstab` configuration to add an entry for the swap file
    ```ini
-    /swap/swapfile none swap defaults 0 0
+   /swap/swapfile none swap defaults 0 0
    ```
    
